@@ -1,7 +1,9 @@
+// TODO: https://stackoverflow.com/questions/11184336/how-to-convert-from-byte-to-int-in-go-programming
 package main
 
 import (
 	"crypto/md5"
+	"encoding/binary"
 	"fmt"
 	"io"
 	"os"
