@@ -1,4 +1,5 @@
 // TODO: https://stackoverflow.com/questions/11184336/how-to-convert-from-byte-to-int-in-go-programming
+// Dont use Strings as Number
 package main
 
 import (
@@ -11,7 +12,7 @@ import (
 )
 
 var (
-	hashes = make(map[string]string)
+	hashes = make(map[uint64]string)
 	// mu     sync.Mutex
 )
 
@@ -19,7 +20,8 @@ func main() {
 	fmt.Printf("%s\n", myHashFun(""))
 	fmt.Printf("%s\n", myHashFun("Leeroy Jenkins"))
 
-	name := "Ilian Odenbach"
+	// name := "Ilian Odenbach"
+	name := "Christopher Felten"
 	h := myHashFun(name)
 
 	// mu.Lock()
@@ -35,12 +37,12 @@ func main() {
 	}
 }
 
-func myHashFun(input string) string {
+func myHashFun(input string) uint64 {
 	h := md5.New()
 	io.WriteString(h, input)
 	// :5 to get the first 40 bit
 	out := h.Sum(nil)[:5]
-	return fmt.Sprintf("%x", out)
+	return binary.BigEndian.Uint64(out)
 }
 
 func checkCollision(i uint64, name string) {
