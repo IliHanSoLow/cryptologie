@@ -4,7 +4,6 @@ package main
 
 import (
 	"crypto/md5"
-	"encoding/binary"
 	"fmt"
 	"io"
 	"os"
@@ -12,7 +11,7 @@ import (
 )
 
 var (
-	hashes = make(map[uint64]string)
+	hashes = make(map[string]string)
 	// mu     sync.Mutex
 )
 
@@ -20,8 +19,7 @@ func main() {
 	fmt.Printf("%s\n", myHashFun(""))
 	fmt.Printf("%s\n", myHashFun("Leeroy Jenkins"))
 
-	// name := "Ilian Odenbach"
-	name := "Christopher Felten"
+	name := "Ilian Odenbach"
 	h := myHashFun(name)
 
 	// mu.Lock()
@@ -37,12 +35,12 @@ func main() {
 	}
 }
 
-func myHashFun(input string) uint64 {
+func myHashFun(input string) string {
 	h := md5.New()
 	io.WriteString(h, input)
 	// :5 to get the first 40 bit
 	out := h.Sum(nil)[:5]
-	return binary.BigEndian.Uint64(out)
+	return fmt.Sprintf("%x", out)
 }
 
 func checkCollision(i uint64, name string) {
