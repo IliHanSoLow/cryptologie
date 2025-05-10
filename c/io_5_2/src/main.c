@@ -12,21 +12,9 @@ main (void)
 
   test_all ();
 
-  char *message
-      = "Bavaria ipsum dolor sit amet lem und lem lossn moand, Musi luja. "
-        "Samma sowos baddscher, Marei. No a Maß auf gehds beim Schichtl "
-        "Mamalad oans, zwoa, gsuffa hod Hetschapfah, Ramasuri. Naa da hog di "
-        "hi Blosmusi d’ wolln. Servas Steckerleis mogsd a Bussal auffi des is "
-        "schee, ded guad liberalitas Bavariae. Kneedl Radi auf gehds beim "
-        "Schichtl Oibadrischl, Baamwach du dadst ma scho daugn Brodzeid. "
-        "Brezn des muas ma hoid kenna Freibia, Ohrwaschl. Foidweg Goaßmaß vui "
-        "huift vui ned woar im Beidl nia need gor boarischer hinter’m Berg "
-        "san a no Leit? Schdarmbeaga See an allerweil, sog i i moan scho aa "
-        "koa und glei wirds no fui lustiga? Kimmt bittschön weida Spezi "
-        "Guglhupf kimmt, i hob di liab des muas ma hoid kenna i moan scho aa "
-        "singd. De Sonn ja, wo samma denn gfreit mi a fescha Bua mei "
-        "Watschnbaam. Hoaglig und Foidweg, ja, wo samma denn a geh iwan Tisch "
-        "ziagn umma Zwedschgndadschi?";
+  char *message =
+"It is twenty years since I first determined to attempt the translation of _Faust_, in the original metres. At that time, although more than a score of English translations of the First Part, and three or four of the Second Part, were in existence, the experiment had not yet been made. The prose version of Hayward seemed to have been accepted as the standard, in default of anything more satisfactory: the English critics, generally sustaining the translator in his views concerning the secondary importance of form in Poetry, practically discouraged any further attempt; and no one, familiar with rhythmical expression through the needs of his own nature, had devoted the necessary love and patience to an adequate reproduction of the great work of Goethe's life.";
+
 
   encrypt_msg_to_file (message,
                        SET_UINT128 (0x0815000000000000, 0x0000000000004711),

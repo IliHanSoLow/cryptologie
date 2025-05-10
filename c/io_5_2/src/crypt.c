@@ -1,5 +1,4 @@
-#include "./crypt.h"
-#include "util.h"
+#include "crypt.h"
 
 extern uint8_t s_box[256];
 
@@ -81,24 +80,32 @@ encrypt_msg_to_file (char *input, __uint128_t master_key, char *file_path)
 
   size_t i = 0;
   __uint128_t message = 0;
-  __uint128_t iv = SET_UINT128 (0x3029cd08ae64012c, 0x88698d9d6ccd7daa);
-  // srand (time (NULL));
-  // __uint128_t iv = ((__uint128_t)rand () << 96) | ((__uint128_t)rand () <<
-  // 64)
-  //                  | ((uint64_t)rand () << 32) | (uint)rand ();
+  srand (time (NULL));
+  __uint128_t iv = ((__uint128_t)rand () << 96) | ((__uint128_t)rand () <<
+  64)
+                   | ((uint64_t)rand () << 32) | (uint)rand ();
   __uint128_t tmpendian = htobe128 (iv);
   fwrite (&tmpendian, sizeof (tmpendian), 1, file);
 
   while (input[i] != '\0')
     {
-      message = message << (8 * (i % 16)) | (uint8_t)input[i];
-      if (i % 16 == 0 && i != 0)
+      message = message << 8 | (uint8_t)input[i];
+      if ((i+1) % 16 == 0)
         {
+          // printf("Message: \t");
+          // print_uint128(message);
           __uint128_t tmp = message ^ iv;
+          // printf("Tmp    : \t");
+          // print_uint128(tmp);
           __uint128_t out = f_rounds (tmp, keys);
+          // printf("Out    : \t");
+          // print_uint128(out);
           tmpendian = htobe128 (out);
+          // printf("Out BE : \t");
+          // print_uint128(tmpendian);
           fwrite (&tmpendian, sizeof (tmpendian), 1, file);
           iv = out;
+          message = 0;
         }
       i++;
     }
@@ -106,11 +113,10 @@ encrypt_msg_to_file (char *input, __uint128_t master_key, char *file_path)
     {
       // fill up with 0
       // printf ("I:%ld\n", i);
-      message = message << (16 - i % 16);
+      message = message << 8*(16 - i % 16);
       __uint128_t tmp = message ^ iv;
       __uint128_t out = f_rounds (tmp, keys);
       iv = out;
-      i = i - i % 16;
       tmpendian = htobe128 (out);
       fwrite (&tmpendian, sizeof (tmpendian), 1, file);
     }
