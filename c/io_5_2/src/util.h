@@ -1,5 +1,6 @@
 #pragma once
 #include <assert.h>
+#include <endian.h>
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -8,4 +9,5 @@
 
 __uint128_t rotl128 (__uint128_t n, unsigned int c);
 __uint128_t rotr128 (__uint128_t n, unsigned int c);
+__uint128_t htobe128 (__uint128_t x);
 void print_uint128 (__uint128_t value);

@@ -1,5 +1,4 @@
 #include "util.h"
-#include "sys/types.h"
 // was generated using gen_s_box with an array
 // uint8_t my_s_box[256] = { 170 }; gen_s_box(my_s_box);
 uint8_t s_box[256] = {
@@ -37,6 +36,13 @@ rotr128 (__uint128_t n, uint32_t c)
 {
   const unsigned int mask = (CHAR_BIT * sizeof (n) - 1);
   return (n >> c) | (n << ((-c) & mask));
+}
+
+__uint128_t
+htobe128 (__uint128_t x)
+{
+  return ((__uint128_t)(htobe64 ((uint64_t)x)) << 64
+          | htobe64 ((uint64_t)(x >> 64)));
 }
 
 void

@@ -1,9 +1,15 @@
 #include "main.h"
+#include "util.h"
 
 int
 // main (int argc, char *argv[])
 main (void)
 {
+  __uint128_t x = SET_UINT128 (0x0123456789ABCDEF, 0xFEDCBA9876543210);
+  print_uint128 (x);
+  print_uint128 (htobe128 (x));
+  printf ("%lx, %lx\n", 0x0123456789ABCDEF, htobe64 (0x0123456789ABCDEF));
+
   test_all ();
 
   char *message
@@ -22,7 +28,7 @@ main (void)
         "Watschnbaam. Hoaglig und Foidweg, ja, wo samma denn a geh iwan Tisch "
         "ziagn umma Zwedschgndadschi?";
 
-  encrypt_msg_to_file (message, strlen (message),
+  encrypt_msg_to_file (message,
                        SET_UINT128 (0x0815000000000000, 0x0000000000004711),
                        "encrypted.bin");
 

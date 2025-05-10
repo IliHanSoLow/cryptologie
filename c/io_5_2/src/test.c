@@ -54,4 +54,7 @@ test_schiffi (void)
 {
   assert (schiffi (0, SET_UINT128 (0xdeadbeef00000000, 0x0000000badc0ffee))
           == SET_UINT128 (0xb743f2fb342c51bf, 0xab950797083f61e9));
+  assert (schiffi (SET_UINT128 (0xdeadbeef00000000, 0x0000000badc0ffee),
+                   SET_UINT128 (0xdeadbeef00000000, 0x0000000badc0ffee))
+          == SET_UINT128 (0xe1a6741fd1ec4e31, 0xb5704950783f4999));
 }

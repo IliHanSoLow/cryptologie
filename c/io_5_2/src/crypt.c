@@ -1,4 +1,5 @@
 #include "./crypt.h"
+#include "util.h"
 
 extern uint8_t s_box[256];
 
@@ -60,64 +61,8 @@ schiffi (__uint128_t input, __uint128_t master_key)
   return f_rounds (input, keys);
 }
 
-cyphertext_T
-encrypt_msg (char *input, size_t input_len, __uint128_t master_key)
-{
-  __uint128_t keys[32] = { 0 };
-  init_keys (master_key, keys);
-
-  size_t i = 0;
-  __uint128_t message = 0;
-  uint8_t *output = (uint8_t *)(malloc (
-      16 + input_len + ((input_len % 16 != 0) ? (16 - input_len % 16) : 0)));
-  __uint128_t iv = SET_UINT128 (0x3029cd08ae64012c, 0x88698d9d6ccd7daa);
-  // srand (time (NULL));
-  // __uint128_t iv = ((__uint128_t)rand () << 96) | ((__uint128_t)rand () <<
-  // 64)
-  //                  | ((uint64_t)rand () << 32) | (uint)rand ();
-  for (size_t j = 0; j < 16; j++)
-    {
-      output[j] = (uint8_t)(iv >> j * 8);
-      // printf ("j: %ld,\t", j);
-    }
-
-  while (input[i] != '\0')
-    {
-      message = message << (8 * (i % 16)) | (uint8_t)input[i];
-      if (i % 16 == 0 && i != 0)
-        {
-          __uint128_t tmp = message ^ iv;
-          __uint128_t out = f_rounds (tmp, keys);
-          iv = out;
-          for (size_t j = 0; j < 16; j++)
-            {
-              output[i + j] = (uint8_t)(out >> j * 8);
-              // printf ("hi i+j: %ld,\t", i + j);
-            }
-        }
-      i++;
-    }
-  if (i % 16 != 0)
-    {
-      // fill up with 0
-      // printf ("I:%ld\n", i);
-      message = message << (16 - i % 16);
-      __uint128_t tmp = message ^ iv;
-      __uint128_t out = f_rounds (tmp, keys);
-      iv = out;
-      i = i - i % 16;
-      for (size_t j = 0; j < 16; j++)
-        {
-          output[i + j + 16] = (uint8_t)(out >> j * 8);
-          // printf ("i+j: %ld,\t", i + j + 16);
-        }
-    }
-  return (cyphertext_T){ output, input_len };
-}
-
 void
-encrypt_msg_to_file (char *input, size_t input_len, __uint128_t master_key,
-                     char *file_path)
+encrypt_msg_to_file (char *input, __uint128_t master_key, char *file_path)
 {
   if (access (file_path, F_OK) == 0)
     {
@@ -130,7 +75,43 @@ encrypt_msg_to_file (char *input, size_t input_len, __uint128_t master_key,
       perror ("could not open file");
       exit (-1);
     }
-  cyphertext_T data = encrypt_msg (input, input_len, master_key);
-  fwrite (data.bytes, sizeof (uint8_t), data.len, file);
-  free (data.bytes);
+
+  __uint128_t keys[32] = { 0 };
+  init_keys (master_key, keys);
+
+  size_t i = 0;
+  __uint128_t message = 0;
+  __uint128_t iv = SET_UINT128 (0x3029cd08ae64012c, 0x88698d9d6ccd7daa);
+  // srand (time (NULL));
+  // __uint128_t iv = ((__uint128_t)rand () << 96) | ((__uint128_t)rand () <<
+  // 64)
+  //                  | ((uint64_t)rand () << 32) | (uint)rand ();
+  __uint128_t tmpendian = htobe128 (iv);
+  fwrite (&tmpendian, sizeof (tmpendian), 1, file);
+
+  while (input[i] != '\0')
+    {
+      message = message << (8 * (i % 16)) | (uint8_t)input[i];
+      if (i % 16 == 0 && i != 0)
+        {
+          __uint128_t tmp = message ^ iv;
+          __uint128_t out = f_rounds (tmp, keys);
+          tmpendian = htobe128 (out);
+          fwrite (&tmpendian, sizeof (tmpendian), 1, file);
+          iv = out;
+        }
+      i++;
+    }
+  if (i % 16 != 0)
+    {
+      // fill up with 0
+      // printf ("I:%ld\n", i);
+      message = message << (16 - i % 16);
+      __uint128_t tmp = message ^ iv;
+      __uint128_t out = f_rounds (tmp, keys);
+      iv = out;
+      i = i - i % 16;
+      tmpendian = htobe128 (out);
+      fwrite (&tmpendian, sizeof (tmpendian), 1, file);
+    }
 }

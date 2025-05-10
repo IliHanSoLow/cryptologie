@@ -13,7 +13,7 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # The -MMD and -MP flags together generate Makefiles for us!
 # These files will have .d instead of .o as the output.
-FLAGS := $(INC_FLAGS) -std=c23 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wstrict-overflow -Wconversion -fno-strict-aliasing -Wno-missing-field-initializers -march=native -MMD -MP
+FLAGS := $(INC_FLAGS) -Wall -Wextra -Wpedantic -Werror -Wshadow -Wstrict-overflow -Wconversion -fno-strict-aliasing -Wno-missing-field-initializers -march=native -MMD -MP
 
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)

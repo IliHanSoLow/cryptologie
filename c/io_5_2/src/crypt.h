@@ -16,7 +16,5 @@ void init_keys (__uint128_t key, __uint128_t keys[32]);
 uint64_t feistel (uint64_t input, __uint128_t key);
 __uint128_t f_round (__uint128_t input, __uint128_t keys[]);
 __uint128_t schiffi (__uint128_t input, __uint128_t master_key);
-cyphertext_T encrypt_msg (char *input, size_t input_len,
-                          __uint128_t master_key);
-void encrypt_msg_to_file (char *input, size_t input_len,
-                          __uint128_t master_key, char *file_path);
+void encrypt_msg_to_file (char *input, __uint128_t master_key,
+                          char *file_path);
