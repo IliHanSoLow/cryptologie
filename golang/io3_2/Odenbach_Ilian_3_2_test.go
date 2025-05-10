@@ -1,3 +1,4 @@
+// To execute the code, run go test -v *.go
 package io2_2
 
 import (
@@ -5,6 +6,7 @@ import (
 	"testing"
 )
 
+// This are the test-cases I used for development
 type TestsHashing_t struct {
 	in     string
 	should uint32
@@ -30,14 +32,18 @@ type TestsLea_t struct {
 }
 
 var leaTests = []TestsLea_t{
-	{mic: 0x632e4e5c, om: "abcd", am: "ef", smic: 0x0f6b8802},
-	{mic: 0x632e4e5c, om: "abcd", am: "efghijk", smic: 0x2638a819},
-	{mic: 0x0f6b8802, om: "abcdef", am: "ghijk", smic: 0},
-	{mic: 0x2638a819, om: "abcdefghijk", am: "foobar", smic: 0},
-	{mic: 0x782a826e, om: "foobar", am: "barfoo", smic: 0},
-	{mic: 0x885dc316, om: "barfoo", am: "foobar", smic: 0},
+	// {mic: 0x632e4e5c, om: "abcd", am: "ef", smic: 0x0f6b8802},
+	// {mic: 0x632e4e5c, om: "abcd", am: "efghijk", smic: 0x2638a819},
+	// {mic: 0x0f6b8802, om: "abcdef", am: "ghijk", smic: 0},
+	// {mic: 0x2638a819, om: "abcdefghijk", am: "foobar", smic: 0},
+	// {mic: 0x782a826e, om: "foobar", am: "barfoo", smic: 0},
+	// {mic: 0x885dc316, om: "barfoo", am: "foobar", smic: 0},
+	// {mic: 0x632e4e5c, om: "abcd", am: "lucacs", smic: 0},
+	// THIS IS THE LENGTH EXTENSION ATTACK I WANT TO BE GRATED
+	{mic: 0x632e4e5c, om: "abcd", am: "iocs2", smic: 0},
 }
 
+// Test the different Qs in the task
 func TestQ1(t *testing.T) {
 	var in uint32 = 0x524f464c
 	var should uint32 = 0xded7e2d2
@@ -62,6 +68,7 @@ func TestQ3(t *testing.T) {
 	}
 }
 
+// Test the different H() 's in the task
 func TestHashing(t *testing.T) {
 	for _, test := range hashingTests {
 		if output := hashing(test.in); output != test.should {
@@ -70,6 +77,7 @@ func TestHashing(t *testing.T) {
 	}
 }
 
+// A verry somple test to check, if the findQ() works
 func TestFindQ(t *testing.T) {
 	var hash uint32 = 0x632e4e5c
 	s, err := findSForQ(hash)
@@ -81,6 +89,7 @@ func TestFindQ(t *testing.T) {
 	}
 }
 
+// Test the length extension attack and print out the final message, and the final MIC
 func TestLea(t *testing.T) {
 	for _, test := range leaTests {
 		outm, outmic, err := lea(test.mic, test.om, test.am)
