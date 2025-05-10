@@ -32,13 +32,6 @@ rotl128 (__uint128_t n, uint32_t c)
 }
 
 __uint128_t
-rotr128 (__uint128_t n, uint32_t c)
-{
-  const unsigned int mask = (CHAR_BIT * sizeof (n) - 1);
-  return (n >> c) | (n << ((-c) & mask));
-}
-
-__uint128_t
 htobe128 (__uint128_t x)
 {
   return ((__uint128_t)(htobe64 ((uint64_t)x)) << 64

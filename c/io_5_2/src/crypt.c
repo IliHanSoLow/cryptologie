@@ -20,7 +20,6 @@ init_keys (__uint128_t key, __uint128_t keys[32])
       else
         kx = keys[i - 1];
       keys[i] = rotl128 (kx, (uint32_t)(7 * i)) ^ 0xabcdef;
-      // print_uint128 (keys[i]);
     }
 }
 
@@ -63,11 +62,13 @@ schiffi (__uint128_t input, __uint128_t master_key)
 void
 encrypt_msg_to_file (char *input, __uint128_t master_key, char *file_path)
 {
+  // delete file if exists
   if (access (file_path, F_OK) == 0)
     {
       remove (file_path);
     }
 
+  // open file
   FILE *file = fopen (file_path, "ab");
   if (file == NULL)
     {
@@ -75,34 +76,28 @@ encrypt_msg_to_file (char *input, __uint128_t master_key, char *file_path)
       exit (-1);
     }
 
+  // init round keys
   __uint128_t keys[32] = { 0 };
   init_keys (master_key, keys);
 
+  // init initial values
   size_t i = 0;
   __uint128_t message = 0;
   srand (time (NULL));
-  __uint128_t iv = ((__uint128_t)rand () << 96) | ((__uint128_t)rand () <<
-  64)
+  __uint128_t iv = ((__uint128_t)rand () << 96) | ((__uint128_t)rand () << 64)
                    | ((uint64_t)rand () << 32) | (uint)rand ();
   __uint128_t tmpendian = htobe128 (iv);
   fwrite (&tmpendian, sizeof (tmpendian), 1, file);
 
+  // execute f_rounds for each text block until text ends. Also writes to file
   while (input[i] != '\0')
     {
       message = message << 8 | (uint8_t)input[i];
-      if ((i+1) % 16 == 0)
+      if ((i + 1) % 16 == 0)
         {
-          // printf("Message: \t");
-          // print_uint128(message);
           __uint128_t tmp = message ^ iv;
-          // printf("Tmp    : \t");
-          // print_uint128(tmp);
           __uint128_t out = f_rounds (tmp, keys);
-          // printf("Out    : \t");
-          // print_uint128(out);
           tmpendian = htobe128 (out);
-          // printf("Out BE : \t");
-          // print_uint128(tmpendian);
           fwrite (&tmpendian, sizeof (tmpendian), 1, file);
           iv = out;
           message = 0;
@@ -113,7 +108,7 @@ encrypt_msg_to_file (char *input, __uint128_t master_key, char *file_path)
     {
       // fill up with 0
       // printf ("I:%ld\n", i);
-      message = message << 8*(16 - i % 16);
+      message = message << 8 * (16 - i % 16);
       __uint128_t tmp = message ^ iv;
       __uint128_t out = f_rounds (tmp, keys);
       iv = out;
