@@ -1,0 +1,73 @@
+Steps:
+
+1. Apply the EME-OAEP encoding operation (Section 9.1.1.2) to the
+message M and the encoding parameters P to produce an encoded message
+EM of length k-1 octets:
+
+EM = EME-OAEP-ENCODE (M, P, k-1)
+
+If the encoding operation outputs "message too long," then output
+"message too long" and stop.
+
+2. Convert the encoded message EM to an integer message
+representative m: m = OS2IP (EM)
+
+3. Apply the RSAEP encryption primitive (Section 5.1.1) to the public
+key (n, e) and the message representative m to produce an integer
+ciphertext representative c:
+
+c = RSAEP ((n, e), m)
+
+4. Convert the ciphertext representative c to a ciphertext C of
+length k octets: C = I2OSP (c, k)
+
+5. Output the ciphertext C.
+
+---
+
+9.1.1.1 Encoding operation
+
+   EME-OAEP-ENCODE (M, P, emLen)
+
+   Options:
+   Hash      hash function (hLen denotes the length in octet of the
+             hash function output)
+   MGF       mask generation function
+
+   Input:
+   M         message to be encoded, an octet string of length at most
+             emLen-1-2hLen
+   P         encoding parameters, an octet string
+   emLen     intended length in octets of the encoded message, at least
+             2hLen+1
+
+   Output:
+   EM        encoded message, an octet string of length emLen;
+             "message too long" or "parameter string too long"
+
+   Steps:
+
+   1. If the length of P is greater than the input limitation for the
+   hash function (2^61-1 octets for SHA-1) then output "parameter string
+   too long" and stop.
+
+   2. If ||M|| > emLen-2hLen-1 then output "message too long" and stop.
+
+   3. Generate an octet string PS consisting of emLen-||M||-2hLen-1 zero
+   octets. The length of PS may be 0.
+
+   4. Let pHash = Hash(P), an octet string of length hLen.
+
+   5. Concatenate pHash, PS, the message M, and other padding to form a
+   data block DB as: DB = pHash || PS || 01 || M
+
+   6. Generate a random octet string seed of length hLen.
+
+   7. Let dbMask = MGF(seed, emLen-hLen).
+
+   8. Let maskedDB = DB \xor dbMask.
+
+   9. Let seedMask = MGF(maskedDB, hLen).
+   10. Let maskedSeed = seed \xor seedMask.
+   11. Let EM = maskedSeed || maskedDB.
+   12. Output EM.

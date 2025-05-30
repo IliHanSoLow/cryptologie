@@ -83,9 +83,11 @@ encrypt_msg_to_file (char *input, __uint128_t master_key, char *file_path)
   // init initial values
   size_t i = 0;
   __uint128_t message = 0;
-  srand (time (NULL));
-  __uint128_t iv = ((__uint128_t)rand () << 96) | ((__uint128_t)rand () << 64)
-                   | ((uint64_t)rand () << 32) | (uint)rand ();
+  srand ((uint)time (NULL));
+  // __uint128_t iv = ((__uint128_t)rand () << 96) | ((__uint128_t)rand () <<
+  // 64)
+  //                  | ((uint64_t)rand () << 32) | (uint)rand ();
+  __uint128_t iv = SET_UINT128 (0x3029cd08ae64012c, 0x88698d9d6ccd7daa);
   __uint128_t tmpendian = htobe128 (iv);
   fwrite (&tmpendian, sizeof (tmpendian), 1, file);
 
