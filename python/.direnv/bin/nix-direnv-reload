@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -e
+if [[ ! -d "/bighdd/Dokumente/DHBW/cryptoProgramming/python" ]]; then
+  echo "Cannot find source directory; Did you move it?"
+  echo "(Looking for "/bighdd/Dokumente/DHBW/cryptoProgramming/python")"
+  echo 'Cannot force reload with this script - use "direnv reload" manually and then try again'
+  exit 1
+fi
+
+# rebuild the cache forcefully
+_nix_direnv_force_reload=1 direnv exec "/bighdd/Dokumente/DHBW/cryptoProgramming/python" true
+
+# Update the mtime for .envrc.
+# This will cause direnv to reload again - but without re-building.
+touch "/bighdd/Dokumente/DHBW/cryptoProgramming/python/.envrc"
+
+# Also update the timestamp of whatever profile_rc we have.
+# This makes sure that we know we are up to date.
+touch -r "/bighdd/Dokumente/DHBW/cryptoProgramming/python/.envrc" "/bighdd/Dokumente/DHBW/cryptoProgramming/python/.direnv"/*.rc
