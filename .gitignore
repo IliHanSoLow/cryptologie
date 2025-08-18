@@ -1,4 +1,7 @@
-/target
+target
 build/
+.direnv
+__pycache__
+tags
 *.o
 *cscope*

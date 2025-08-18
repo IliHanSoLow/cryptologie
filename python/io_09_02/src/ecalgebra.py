@@ -1,32 +1,27 @@
-# __
-#     self.curve == other.curve and self.x == other.x and self.y == other.y):
-#     ^^^^^^^^^^^^^^^^^^^^^^^^^
-#   File "/bighdd/Dokumente/DHBW/cryptoProgramming/python/io_09_02/src/ecalgebra.py", line 67, in __eq
-# __
-#     self.b == other.b and self.G == other.G and self.n == other.n and self.h == other.h):
-#                           ^^^^^^^^^^^^^^^^^
-#   File "/bighdd/Dokumente/DHBW/cryptoProgramming/python/io_09_02/src/ecalgebra.py", line 11, in __eq
-# __
-
 class ElipticCurve:
     class Point:
-        def __init__(self, curve: 'ElipticCurve', x:int, y: int, isInf: bool = False) -> None:
-            self.isInf: bool = isInf
+        def __init__(self, curve: 'ElipticCurve', x:int, y: int) -> None:
             self.curve: ElipticCurve = curve
             self.x: int = x
             self.y: int = y
 
         def __eq__(self, other) -> bool:
-            if (isinstance(other, ElipticCurve.Point) and self.isInf == other.isInf and
-                    self.curve == other.curve and self.x == other.x and self.y == other.y):
-                return True
-            return False
+            if not isinstance(other, ElipticCurve.Point):
+                return False
+            return (self.curve == other.curve and self.x == other.x and self.y == other.y)
+            # if (isinstance(other, ElipticCurve.Point) and self.isInf == other.isInf and
+            #         self.curve == other.curve and self.x == other.x and self.y == other.y):
+            #     return True
+            # return False
 
         def __add__(self, other: 'ElipticCurve.Point') -> 'ElipticCurve.Point':
-            if self.isInf:
+            if self.x == 0 and self.y == 0:
                 return other
-            elif other.isInf:
+            elif other.x ==0 and other.y == 0:
                 return self
+
+            if self.x == other.x and (self.y != other.y or self.y == 0):
+                return ElipticCurve.Point(self.curve, 0, 0)
 
             if self == other:
                 return 2*self
@@ -34,32 +29,39 @@ class ElipticCurve:
                 raise Exception("Points dont operate on the same curve")
 
             p= self.curve.p
-            s = (self.y-other.y)* pow(self.x-other.x, -1, p)
+            s = ((self.y-other.y)* pow(self.x-other.x, -1, p))%p
             tx = int(s*s - self.x - other.x) % p
-            ty = int(s* (self.x - other.x) - self.y) % p
+            ty = int(s* (self.x - tx) - self.y) % p
             return ElipticCurve.Point(self.curve, tx,ty)
 
+
+        def __repr__(self):
+            return f"{self.x}, {self.y}"
+
         def double(self) -> 'ElipticCurve.Point':
-            if self.isInf:
+            if self.x == 0 and self.y == 0:
                 return self
             p= self.curve.p
             a = self.curve.a
-            s = (3*pow(self.x, 2, p)+a) * pow(2*self.y, -1, p)
+            s = ((3*pow(self.x, 2, p)+a) * pow(2*self.y, -1, p)) %p
             tx = int(s*s - 2*self.x) % p
             ty = int(s* (self.x - tx) - self.y) % p
             return ElipticCurve.Point(self.curve, tx,ty)
 
 
         def __rmul__(self, other: int)->'ElipticCurve.Point':
-            if self.isInf:
+            if self.x == 0 and self.y == 0:
                 return self
-            n = self
-            r = ElipticCurve.Point(self.curve, 0, 0, True)
 
-            for bit in bin(other)[2:]:
-                if bit == '1':
-                    r = r+n
+            p= self.curve.p
+            n = self
+            r = ElipticCurve.Point(self.curve, 0, 0)
+
+            while other:
+                if other & 1:
+                    r = (r+n)
                 n = n.double()
+                other>>=1
 
             return r
 
